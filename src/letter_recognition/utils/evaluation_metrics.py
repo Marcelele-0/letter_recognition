@@ -24,7 +24,7 @@ def calculate_class_weights(labels):
 
     if len(class_counts) == 1:
         # Single class present in the labels
-        return np.array([1.0])
+        return torch.tensor([1.0])  # Return as torch tensor
 
     total_samples = np.sum(class_counts)
 
@@ -32,4 +32,4 @@ def calculate_class_weights(labels):
     class_weights = total_samples / (class_counts + epsilon)
     class_weights = class_weights / np.sum(class_weights)
     
-    return class_weights
+    return torch.tensor(class_weights, dtype=torch.float32)
