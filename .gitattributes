@@ -2,3 +2,4 @@
 src/letter_recognition/data/test/X_test.npy filter=lfs diff=lfs merge=lfs -text
 src/letter_recognition/data/train/X_train_weight.npy filter=lfs diff=lfs merge=lfs -text
 src/letter_recognition/data/test/X_train_resampled.npy filter=lfs diff=lfs merge=lfs -text
+src/letter_recognition/data/test/y_train_resampled.npy filter=lfs diff=lfs merge=lfs -text
