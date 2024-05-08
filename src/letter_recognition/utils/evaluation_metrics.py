@@ -14,7 +14,7 @@ def calculate_class_weights(labels):
     if labels.size == 0:
         raise ValueError("Empty input labels array.")
     
-    if labels.dtype == np.object:
+    if labels.dtype == object:
         try:
             labels = labels.astype(np.float)
         except ValueError:
