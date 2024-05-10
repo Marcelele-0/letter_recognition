@@ -1,7 +1,10 @@
 import torch
-
 import torch.nn as nn
 import torch.nn.functional as F
+from torchinfo import summary
+
+import io
+from contextlib import redirect_stdout
 
 class LeNet5(nn.Module):
     def __init__(self):
@@ -35,3 +38,16 @@ class LeNet5(nn.Module):
         x = F.relu(self.fc2(x))
         x = self.fc3(x)
         return x
+
+
+    # Static method to get the model summary
+    @staticmethod
+    def get_summary():
+        model = LeNet5()
+        f = io.StringIO()
+        with redirect_stdout(f):
+            summary(model, input_size=(1, 1, 28, 28), col_width=20,
+                        col_names=['input_size', 'output_size', 'num_params', 'trainable'], row_settings=['var_names'], verbose=2)
+        return f.getvalue()
+
+

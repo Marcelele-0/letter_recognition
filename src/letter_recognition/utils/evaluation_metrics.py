@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from torchmetrics import accuracy
 
 def calculate_class_weights(labels):
     if isinstance(labels, torch.Tensor):
@@ -33,3 +34,7 @@ def calculate_class_weights(labels):
     class_weights = class_weights / np.sum(class_weights)
     
     return torch.tensor(class_weights, dtype=torch.float32)
+
+
+def calculate_accuracy(y_true, y_pred):
+    return accuracy_score
