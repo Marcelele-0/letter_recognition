@@ -2,6 +2,8 @@ import unittest
 import numpy as np
 import torch
 from letter_recognition.utils.evaluation_metrics import calculate_class_weights
+from letter_recognition.utils.evaluation_metrics import calculate_loss_and_accuracy
+import torch.nn.functional as F
 
 class TestCalculateClassWeights(unittest.TestCase):
     def test_torch_tensor_input(self):
@@ -61,6 +63,30 @@ class TestCalculateClassWeights(unittest.TestCase):
         max_delta = 1e-6
 
         self.assertTrue(torch.allclose(actual_weights, expected_weights, atol=max_delta)) 
+
+class TestCalculateLossAndAccuracy(unittest.TestCase):
+    def test_loss_and_accuracy(self):
+        # Przygotowanie danych testowych
+        outputs = torch.tensor([[0.2, 0.5, 0.3], [0.7, 0.1, 0.2]])
+        labels = torch.tensor([[0, 1, 0], [1, 0, 0]])
+
+        # Obliczanie straty i dokładności przy użyciu funkcji testowanej
+        loss, accuracy = calculate_loss_and_accuracy(outputs, labels)
+
+        # Obliczanie oczekiwanej wartości straty
+        expected_loss = F.cross_entropy(outputs, torch.argmax(labels, dim=1))
+
+        # Sprawdzenie poprawności obliczonej wartości straty
+        self.assertAlmostEqual(loss.item(), expected_loss.item(), delta=1e-5)
+
+        # Obliczanie oczekiwanej wartości dokładności
+        expected_accuracy = torch.tensor(1.0)  # W przypadku danych testowych, oba przykłady są poprawnie sklasyfikowane
+
+        # Sprawdzenie poprawności obliczonej wartości dokładności
+        self.assertAlmostEqual(accuracy, expected_accuracy.item(), delta=1e-5)
+
+if __name__ == '__main__':
+    unittest.main()
 
 if __name__ == '__main__':
     unittest.main()

@@ -1,6 +1,6 @@
 import torch
 import numpy as np
-from torchmetrics import accuracy
+import torch.nn.functional as F
 
 def calculate_class_weights(labels):
     if isinstance(labels, torch.Tensor):
@@ -35,6 +35,13 @@ def calculate_class_weights(labels):
     
     return torch.tensor(class_weights, dtype=torch.float32)
 
+def calculate_loss_and_accuracy(outputs, labels):
+    # Obliczanie straty za pomocą funkcji cross-entropy
+    loss = F.cross_entropy(outputs, torch.argmax(labels, dim=1))
 
-def calculate_accuracy(y_true, y_pred):
-    return accuracy_score
+    # Obliczanie dokładności
+    _, predicted = torch.max(outputs, 1)
+    correct_predictions = (predicted == torch.argmax(labels, dim=1)).sum().item()
+    accuracy = correct_predictions / labels.size(0)
+
+    return loss, accuracy
