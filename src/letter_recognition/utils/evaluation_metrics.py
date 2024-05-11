@@ -11,8 +11,9 @@ def calculate_class_weights(labels_onehot):
     if len(labels_onehot.shape) != 2:
         raise ValueError("Input should have 2 dimensions")
     
-    if torch.any(labels_onehot < 0) or torch.any(labels_onehot > 1):
+    if not ((labels_onehot == 0) | (labels_onehot == 1)).all():
         raise ValueError("Input should contain only 0s and 1s")
+
     
     if torch.sum(labels_onehot, dim=1).min() == 0:
         raise ValueError("Input should not contain any zero rows")
@@ -21,12 +22,9 @@ def calculate_class_weights(labels_onehot):
 
     class_counts = np.bincount(labels)
 
-    if len(class_counts) == 1:
-        return torch.tensor([1.0], dtype=torch.float32)
-
     total_samples = np.sum(class_counts)
 
-    epsilon = 1e-7  # Small epsilon value to avoid division by zero
+    epsilon = 1e-9  # Small epsilon value to avoid division by zero
     class_weights = total_samples / (class_counts + epsilon)
     class_weights = class_weights / np.sum(class_weights)
     
