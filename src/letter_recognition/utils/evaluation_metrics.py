@@ -2,30 +2,27 @@ import torch
 import numpy as np
 import torch.nn.functional as F
 
-def calculate_class_weights(labels):
-    if isinstance(labels, torch.Tensor):
-        labels = labels.cpu().detach().numpy()
-
-    elif not isinstance(labels, (np.ndarray, list, tuple)):
-        raise ValueError("Unsupported data type for labels. Supported types: numpy array, list, tuple.")
-
-    if not isinstance(labels, np.ndarray):
-        labels = np.array(labels)
-
-    if labels.size == 0:
-        raise ValueError("Empty input labels array.")
+def calculate_class_weights(labels_onehot):
+    if isinstance (labels_onehot, np.ndarray):
+        labels_onehot = torch.tensor(labels_onehot, dtype=torch.float32)
+    elif not isinstance(labels_onehot, torch.Tensor):
+        raise ValueError("Input should be a numpy array or a PyTorch tensor")
     
-    if labels.dtype == object:
-        try:
-            labels = labels.astype(np.float)
-        except ValueError:
-            raise ValueError("Labels array contains non-numeric values that cannot be converted to float.")
+    if len(labels_onehot.shape) != 2:
+        raise ValueError("Input should have 2 dimensions")
+    
+    if torch.any(labels_onehot < 0) or torch.any(labels_onehot > 1):
+        raise ValueError("Input should contain only 0s and 1s")
+    
+    if torch.sum(labels_onehot, dim=1).min() == 0:
+        raise ValueError("Input should not contain any zero rows")
+
+    labels = torch.argmax(labels_onehot, dim=1)
 
     class_counts = np.bincount(labels)
 
     if len(class_counts) == 1:
-        # Single class present in the labels
-        return torch.tensor([1.0])  # Return as torch tensor
+        return torch.tensor([1.0], dtype=torch.float32)
 
     total_samples = np.sum(class_counts)
 
@@ -34,6 +31,7 @@ def calculate_class_weights(labels):
     class_weights = class_weights / np.sum(class_weights)
     
     return torch.tensor(class_weights, dtype=torch.float32)
+
 
 def calculate_loss_and_accuracy(outputs, labels):
     # Obliczanie straty za pomocą funkcji cross-entropy

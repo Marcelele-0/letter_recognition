@@ -3,66 +3,100 @@ import numpy as np
 import torch
 from letter_recognition.utils.evaluation_metrics import calculate_class_weights
 from letter_recognition.utils.evaluation_metrics import calculate_loss_and_accuracy
+import unittest
+import numpy as np
+import torch
+
 import torch.nn.functional as F
 
+
+
 class TestCalculateClassWeights(unittest.TestCase):
-    def test_torch_tensor_input(self):
-        labels = torch.tensor([0, 1, 0, 1])
-        expected_weights = torch.tensor([0.5, 0.5])  # Changed to torch tensor
-        actual_weights = calculate_class_weights(labels)
+    def test_tensor_input(self):
+        labels_onehot = torch.tensor([[0, 1, 0], [1, 0, 0], [0, 0, 1], [1, 0, 0]])
+        weights = calculate_class_weights(labels_onehot)
 
-        max_delta = 1e-6  # Adjust as needed
+        expected_weights = torch.tensor([0.2, 0.4, 0.4])
 
-        self.assertTrue(torch.allclose(actual_weights, expected_weights, atol=max_delta))  # Changed to torch.allclose
+        self.assertTrue(torch.allclose(weights, expected_weights, atol=1e-5))
 
-    def test_numpy_array_input(self):
-        labels = np.array([0, 1, 1, 0])
-        expected_weights = torch.tensor([0.5, 0.5])  # Changed to torch tensor
+    def test_numpy_input(self):
+        labels_onehot = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1], [0, 1, 0]])
+        weights = calculate_class_weights(labels_onehot)
 
-        self.assertTrue(torch.allclose(calculate_class_weights(labels), expected_weights))  # Changed to torch.allclose
+        expected_weights = torch.tensor([0.4, 0.2, 0.4]) 
 
-    def test_unsupported_data_type(self):
-        labels = "invalid"
+        self.assertTrue(torch.allclose(weights, expected_weights, atol=1e-5))
 
-        with self.assertRaises(ValueError):
-            calculate_class_weights(labels)
-
-    def test_object_dtype_labels(self):
-        labels = np.array(["A", "B", "A", "B"])
-        expected_weights = torch.tensor([0.5, 0.5])
-        label_map = {"A": 0, "B": 1}
-        integer_labels = np.array([label_map[label] for label in labels])
-
-        self.assertTrue(torch.allclose(calculate_class_weights(integer_labels), expected_weights)) 
-
-    def test_empty_labels(self):
-        labels = np.array([])
+    def test_invalid_input(self):
+        labels_onehot = "Invalid input"
 
         with self.assertRaises(ValueError):
-            calculate_class_weights(labels)
+            calculate_class_weights(labels_onehot)
 
-    def test_single_class_labels(self):
-        labels = np.array([0, 0, 0, 0])
+    def test_zero_class(self):
+        labels_onehot = torch.tensor([[0, 0, 0], [1, 0, 0], [0, 1, 0]])
+
+        with self.assertRaises(ValueError):
+            calculate_class_weights(labels_onehot)  
+
+    def test_empty_input(self):
+        labels_onehot = torch.tensor([])
+
+        with self.assertRaises(ValueError):
+            calculate_class_weights(labels_onehot)
+
+    def test_single_class(self):
+        labels_onehot = torch.tensor([[0, 1, 0], [0, 1, 0], [0, 1, 0]])
+        weights = calculate_class_weights(labels_onehot)
+
         expected_weights = torch.tensor([1.0])
-        actual_weights = calculate_class_weights(labels)
 
-        max_delta = 1e-6  # Adjust as needed
+        self.assertTrue(torch.allclose(weights, expected_weights, atol=1e-5))
 
-        self.assertTrue(torch.allclose(actual_weights, expected_weights, atol=max_delta))
+    def test_too_deep_input(self):
+        labels_onehot = torch.tensor([[[0, 1, 0], [1, 0, 0]], [[0, 0, 1], [0, 1, 0]]])
 
-    def test_multi_class_labels(self):
-        labels = np.array([[0, 1, 0], [1, 0, 1], [0, 1, 0]])
         with self.assertRaises(ValueError):
-            calculate_class_weights(labels)
+            calculate_class_weights(labels_onehot)
+    
+    def test_negative_input(self):
+        labels_onehot = torch.tensor([[0, 1, 0], [1, 0, 0], [0, 0, -1]])
 
-    def test_large_class_counts(self):
-        labels = np.array([0] * 1000000 + [1] * 1000000 + [2] * 1000000)  # Three classes with large counts
-        expected_weights = torch.tensor([1/3, 1/3, 1/3])  # Expected weights for balanced classes
-        actual_weights = calculate_class_weights(labels)
+        with self.assertRaises(ValueError):
+            calculate_class_weights(labels_onehot)
 
-        max_delta = 1e-6
+    def test_too_large_input(self):
+        labels_onehot = torch.tensor([[0, 1, 0], [1, 0, 0], [0, 0, 2]])
 
-        self.assertTrue(torch.allclose(actual_weights, expected_weights, atol=max_delta)) 
+        with self.assertRaises(ValueError):
+            calculate_class_weights(labels_onehot)
+
+    def test_too_shallow_input(self):
+        labels_onehot = torch.tensor([0, 1, 0])
+
+        with self.assertRaises(ValueError):
+            calculate_class_weights(labels_onehot)
+
+    def test_long_input(self):
+        labels_onehot = torch.tensor([[0, 1, 0], [1, 0, 0], [0, 0, 1]]*1000)
+        weights = calculate_class_weights(labels_onehot)
+
+        expected_weights = torch.tensor([0.3333, 0.3333, 0.3333])
+
+        self.assertTrue(torch.allclose(weights, expected_weights, atol=1e-5))
+
+    def test_average_onehot_input(self):
+        labels_onehot = torch.eye(100)  # Tworzenie macierzy jednostkowej 100x100
+        labels_onehot_avg = torch.mean(labels_onehot, dim=0, keepdim=True)  # Obliczanie średniej po wymiarze 0
+
+        weights = calculate_class_weights(labels_onehot_avg)
+
+        expected_weights = torch.tensor([0.01] * 100)  # Wszystkie wagi powinny być równe 0.01
+
+        self.assertTrue(torch.allclose(weights, expected_weights, atol=1e-5))
+
+
 
 class TestCalculateLossAndAccuracy(unittest.TestCase):
     def test_loss_and_accuracy(self):
@@ -84,9 +118,6 @@ class TestCalculateLossAndAccuracy(unittest.TestCase):
 
         # Sprawdzenie poprawności obliczonej wartości dokładności
         self.assertAlmostEqual(accuracy, expected_accuracy.item(), delta=1e-5)
-
-if __name__ == '__main__':
-    unittest.main()
 
 if __name__ == '__main__':
     unittest.main()

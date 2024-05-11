@@ -42,3 +42,8 @@ class CustomDataLoader:
         val_loader = DataLoader(self.val_dataset, batch_size=self.batch_size)
 
         return train_loader, val_loader
+    
+
+# use: 
+# custom_data_loader = CustomDataLoader(batch_size=64)
+# train_loader, val_loader = custom_data_loader.get_data_loader()
