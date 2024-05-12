@@ -51,7 +51,9 @@ test_data_path = os.path.join(model_dir, '../data/test/X_test.npy')
 # Load the test data
 test_data = np.load(test_data_path)
 
-# Display predictions for five different images from the test set
-for i in range(100):
-    image = test_data[i]
+#   predictions for couple random different images from the test set
+
+for i in range(5):
+    random_index = np.random.randint(0, len(test_data))
+    image = test_data[random_index]
     display_prediction(model, image)
