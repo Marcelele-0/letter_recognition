@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import torch.nn.functional as F
+from torch import nn
 
 def calculate_class_weights(labels_onehot):
     if isinstance(labels_onehot, np.ndarray):
@@ -37,8 +38,9 @@ def calculate_class_weights(labels_onehot):
 
 
 def calculate_loss_and_accuracy(outputs, labels):
-    # Obliczanie straty za pomocą funkcji cross-entropy
-    loss = F.cross_entropy(outputs, torch.argmax(labels, dim=1))
+    # Obliczanie funkcji straty za pomocą nn.CrossEntropyLoss
+    criterion = nn.CrossEntropyLoss()
+    loss = criterion(outputs, torch.argmax(labels, dim=1))
 
     # Obliczanie dokładności
     _, predicted = torch.max(outputs, 1)
@@ -46,3 +48,5 @@ def calculate_loss_and_accuracy(outputs, labels):
     accuracy = correct_predictions / labels.size(0)
 
     return loss, accuracy
+
+

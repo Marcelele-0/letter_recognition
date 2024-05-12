@@ -22,9 +22,6 @@ class CustomDataLoader:
         y_train = np.load(y_train_path)
         X_val = np.load(X_val_path)
         y_val = np.load(y_val_path)
-
-        print(f'X_train shape: {X_train.shape}')
-
         
         # Convert data to PyTorch tensors
         X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
@@ -36,8 +33,6 @@ class CustomDataLoader:
         X_train_tensor = X_train_tensor.unsqueeze(1)
         X_val_tensor = X_val_tensor.unsqueeze(1)
         
-        
-
         # Create TensorDataset for training and validation data
         self.train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
         self.val_dataset = TensorDataset(X_val_tensor, y_val_tensor)
