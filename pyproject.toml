@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "letter_recognition"
-version = "0.2.1"
+version = "3.0.0"
 description = "ML program to recognise capital letters"
 authors = ["marcelele-0"]
 license = "None"

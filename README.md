@@ -2,6 +2,9 @@
 
 ML program to recognise capital letters
 
+# patch 
+- 3.0.0 - release
+
 ## Installation
 
 ```bash
