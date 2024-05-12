@@ -21,6 +21,8 @@ print ("Loaded the data")
 class_weights = calculate_class_weights(data.train_dataset.tensors[1])
 class_weights = class_weights.to(device)
 print("Calculated class weights") 
+print(class_weights)
+
 
 # Initialize the model
 model = LeNet5()

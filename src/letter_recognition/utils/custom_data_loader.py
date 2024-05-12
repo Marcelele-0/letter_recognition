@@ -23,6 +23,8 @@ class CustomDataLoader:
         X_val = np.load(X_val_path)
         y_val = np.load(y_val_path)
 
+        print(f'X_train shape: {X_train.shape}')
+
         
         # Convert data to PyTorch tensors
         X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
@@ -51,5 +53,5 @@ class CustomDataLoader:
         return train_loader, val_loader
     
 
-custom_data_loader = CustomDataLoader(batch_size=64)
-train_loader, val_loader = custom_data_loader.get_data_loader()
+
+
