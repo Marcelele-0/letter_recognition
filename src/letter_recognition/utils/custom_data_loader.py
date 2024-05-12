@@ -9,25 +9,32 @@ class CustomDataLoader:
 
     def load_data(self):
         # Get the directory that this script is in
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+        src_lr_dir = os.path.dirname(os.path.abspath(__file__))
 
         # Construct absolute paths to the data files
-        X_train_path = os.path.join(script_dir, '../data/train/X_train_weight.npy')
-        y_train_path = os.path.join(script_dir, '../data/train/y_train_weight.npy')
-        X_val_path = os.path.join(script_dir, '../data/val/X_val.npy')
-        y_val_path = os.path.join(script_dir, '../data/val/y_val.npy')
+        X_train_path = os.path.join(src_lr_dir, '../data/train/X_train_weight.npy')
+        y_train_path = os.path.join(src_lr_dir, '../data/train/y_train_weight.npy')
+        X_val_path = os.path.join(src_lr_dir, '../data/val/X_val.npy')
+        y_val_path = os.path.join(src_lr_dir, '../data/val/y_val.npy')
 
         # Load data from .npy files
         X_train = np.load(X_train_path)
         y_train = np.load(y_train_path)
         X_val = np.load(X_val_path)
         y_val = np.load(y_val_path)
+
         
         # Convert data to PyTorch tensors
         X_train_tensor = torch.tensor(X_train, dtype=torch.float32)
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         X_val_tensor = torch.tensor(X_val, dtype=torch.float32)
         y_val_tensor = torch.tensor(y_val, dtype=torch.float32)
+
+        # add an channel dimension to the images
+        X_train_tensor = X_train_tensor.unsqueeze(1)
+        X_val_tensor = X_val_tensor.unsqueeze(1)
+        
+        
 
         # Create TensorDataset for training and validation data
         self.train_dataset = TensorDataset(X_train_tensor, y_train_tensor)
@@ -44,6 +51,5 @@ class CustomDataLoader:
         return train_loader, val_loader
     
 
-# use: 
-# custom_data_loader = CustomDataLoader(batch_size=64)
-# train_loader, val_loader = custom_data_loader.get_data_loader()
+custom_data_loader = CustomDataLoader(batch_size=64)
+train_loader, val_loader = custom_data_loader.get_data_loader()
