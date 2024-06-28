@@ -49,5 +49,7 @@ class LeNet5(nn.Module):
             summary(model, input_size=(1, 1, 28, 28), col_width=20,
                         col_names=['input_size', 'output_size', 'num_params', 'trainable'], row_settings=['var_names'], verbose=2)
         return f.getvalue()
+    
+    
 
 

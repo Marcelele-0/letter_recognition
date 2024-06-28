@@ -53,7 +53,7 @@ test_data = np.load(test_data_path)
 
 #   predictions for couple random different images from the test set
 
-for i in range(5):
+for i in range(10):
     random_index = np.random.randint(0, len(test_data))
     image = test_data[random_index]
     display_prediction(model, image)
