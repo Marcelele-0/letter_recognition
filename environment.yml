@@ -1,0 +1,11 @@
+name: letter_recognition
+dependencies:
+  - python=3.8
+  - pytorch
+  - torchvision
+  - pytorch-lightning
+  - pip
+  - pip:
+      - torch
+      - torchvision
+      - lightning
