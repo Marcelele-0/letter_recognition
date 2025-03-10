@@ -1,24 +1,23 @@
-# Letter Recognition - Środowisko Conda
+# Letter Recognition - Conda Environment
 
-## Tworzenie środowiska
+## Creating the Environment
 
-Aby utworzyć środowisko Conda z pliku `env.yaml`, wykonaj poniższe kroki:
+To create a Conda environment from the `env.yaml` file, follow these steps:
 
-1. Upewnij się, że masz zainstalowaną Condę.
-2. Uruchom terminal i przejdź do katalogu zawierającego plik `env.yaml`.
-3. Wykonaj polecenie:
+1. Make sure you have Conda installed.
+2. Open a terminal and navigate to the directory containing the `env.yaml` file.
+3. Run the command:
    ```bash
    conda env create -f env.yaml
    ```
-4. Po zakończeniu instalacji aktywuj środowisko:
+4. After the installation is complete, activate the environment:
    ```bash
    conda activate letter_recognition
    ```
 
-## Usuwanie środowiska
+## Removing the Environment
 
-Jeśli chcesz usunąć środowisko, użyj polecenia:
+If you want to remove the environment, use the command:
 ```bash
 conda remove --name letter_recognition --all
 ```
-
