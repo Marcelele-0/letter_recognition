@@ -8,7 +8,7 @@ To create a Conda environment from the `env.yaml` file, follow these steps:
 2. Open a terminal and navigate to the directory containing the `env.yaml` file.
 3. Run the command:
    ```bash
-   conda env create -f env.yaml
+   conda env create -f environment.yaml
    ```
 4. After the installation is complete, activate the environment:
    ```bash
