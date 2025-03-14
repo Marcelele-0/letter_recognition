@@ -31,7 +31,7 @@ class LeNet5(nn.Module):
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        # Placeholder for dynamically computing the input to FC layers
+        # TODO: fix this
         self._fc_input_dim = None
 
         # Fully connected layers (initialized later)
