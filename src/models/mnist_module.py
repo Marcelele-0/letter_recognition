@@ -1,43 +1,26 @@
-import lightning as pl
-import torch
-import torch.nn as nn
+from typing import Tuple
+
+
+import torch 
+import pytorch_lightning as pl
 from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics.classification.accuracy import Accuracy
-from typing import Optional, Tuple
 
 
-
-class MNISTModule(pl.LightningModule):
-    """
-    LightningModule for MNIST classification
-
-    A 'LightningModule' is a subclass of 'nn.Module' that provides additional
-    functionality to streamline the training process. It includes the following
-    methods:
-
-    - setup: defines the data loaders
-    - forward: defines the forward pass of the model
-    - training_step: defines the training step
-    - validation_step: defines the validation step
-    - test_step: defines the test step
-    """
+class MNISTLitModule(pl.LightningModule):
+    """PyTorch Lightning Module for MNIST classification."""
 
     def __init__(
-            self,
-            model,
-            optimizer = torch.optim.Adam,
-            lr: float = 0.001,
-            loss_fn = nn.CrossEntropyLoss,
-            compile: bool = True
+        self,
+        model: torch.nn.Module,
+        compile_model: bool = False,
     ) -> None:
         """
-        Initializes the MNISTModule.
-        
+        Initializes the module.
+
         Args:
-            model: The model to train
-            optimizer: The optimizer to use for training. Defaults to Adam.
-            lr (float): The learning rate for the optimizer. Defaults to 0.001.
-            compile (bool): Whether to compile the model. Defaults to True.
+            model: Neural network model.
+            compile_model: Whether to use `torch.compile()`.
         """
         super().__init__()
 
@@ -46,9 +29,10 @@ class MNISTModule(pl.LightningModule):
 
         # Save the model and optimizer
         self.model = model
+        self.compile_model = compile_model
 
-        # Save the loss function
-        self.loss_fn = loss_fn
+        # Loss function
+        self.criterion = torch.nn.CrossEntropyLoss()
 
         # Metrics to track
         self.train_acc = Accuracy(task="multiclass", num_classes=10)
@@ -60,8 +44,7 @@ class MNISTModule(pl.LightningModule):
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
 
-        # Optimizer
-        self.val_acc_max = MaxMetric()
+        self.val_acc_best = MaxMetric()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -96,96 +79,69 @@ class MNISTModule(pl.LightningModule):
         logits = self.model(x)
 
         # Compute the loss
-        loss = self.loss_fn(logits, y)
+        loss = self.criterion(logits, y)
 
         # Compute the predictions
         preds = torch.argmax(logits, dim=1)
+        return loss, preds, y
 
-        return preds,loss, y
+    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+        """Single training step."""
+        loss, preds, targets = self.model_step(batch)
 
-    def training_step(
-            self, 
-            batch: Tuple[torch.Tensor, torch.Tensor],
-            batch_idx: int
-        ) -> torch.Tensor:
-        """
-        Defines a single training step on a batch of data.
+        self.train_loss.update(loss)
+        self.train_acc.update(preds, targets)
 
-        params:
-         - batch: A tuple containing the input data and labels
-         - batch_idx: The index of the batch
-
-        returns:
-         - The loss for the batch - Tensor 
-        """
-        
-        preds, loss, targets = self.model_step(batch)
-
-        # Log the metrics
-        self.train_loss(loss)
-        self.train_acc(preds, targets)
-
-        self.log("train_loss", self.train_loss, on_step=True, on_epoch=True)
-        self.log("train_acc", self.train_acc, on_step=True, on_epoch=True)
+        self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
 
         return loss
-    
-    def validation_step(
-            self,
-            batch: Tuple[torch.Tensor, torch.Tensor],
-            batch_idx: int
-        ) -> None:
-        """
-        Defines a single validation step on a batch of data.
 
-        params:
-         - batch: A tuple containing the input data and labels
-         - batch_idx: The index of the batch
-        """
-
-        preds, loss, targets = self.model_step(batch)
+    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> None:
+        """Single validation step."""
+        loss, preds, targets = self.model_step(batch)
 
         # Log the metrics
-        self.val_loss(loss)
-        self.val_acc(preds, targets)
-        
-        self.log("val_loss", self.val_loss, on_step=False, on_epoch=True)
-        self.log("val_acc", self.val_acc, on_step=False, on_epoch=True)
+        self.val_loss.update(loss)
+        self.val_acc.update(preds, targets)
 
-    def test_step(
-            self,
-            batch: Tuple[torch.Tensor, torch.Tensor],
-            batch_idx: int
-        ) -> None:
-        """
-        Defines a single test step on a batch of data.
+        self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
 
-        params:
-         - batch: A tuple containing the input data and labels
-         - batch_idx: The index of the batch
-        """
-
-        preds, loss, targets = self.model_step(batch)
+    def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> None:
+        """Single test step."""
+        loss, preds, targets = self.model_step(batch)
 
         # Log the metrics
-        self.test_loss(loss)
-        self.test_acc(preds, targets)
+        self.test_loss.update(loss)
+        self.test_acc.update(preds, targets)
 
-        self.log("test_loss", self.test_loss, on_step=False, on_epoch=True)
-        self.log("test_acc", self.test_acc, on_step=False, on_epoch=True)
+        self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
 
-    def setup(self, stage) -> None:
-        """
-        Set up the data loaders for the model.
+    def on_train_start(self) -> None:
+        """Resets validation metrics at the start of training."""
+        self.val_loss.reset()
+        self.val_acc.reset()
+        self.val_acc_best.reset()
 
-        params:
-         - stage: The stage of training (fit, validate, test, predict)
-        """
-        if stage == "fit" and compile:
+    def on_validation_epoch_end(self) -> None:
+        """Updates the best validation accuracy at the end of each epoch."""
+        acc = self.val_acc.compute()
+        self.val_acc_best.update(acc)
+        self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
+
+    def setup(self, stage: str) -> None:
+        """Compiles the model if required."""
+        if self.compile_model and stage == "fit":
             self.model = torch.compile(self.model)
 
     def configure_optimizers(self):
-        # TODO: Add learning rate scheduler
-        pass
+        # Define the optimizer
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3) # type: ignore - pylance reports an error, but it's correct
 
-    # TODO: add lightning hooks on stages end
+        # Define the scheduler (StepLR)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+
+        # Return optimizer and scheduler
+        return [optimizer], [scheduler]

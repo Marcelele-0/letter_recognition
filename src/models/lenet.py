@@ -2,55 +2,41 @@ import torch
 import torch.nn as nn
 
 class LeNet5(nn.Module):
-    """
-    A simple LeNet implementation for MNIST number classification.
-    """
-
     def __init__(
-            self,
-            num_classes: int = 10,
-            activation: type = nn.ReLU,  
+        self,
+        input_channels: int = 1,
+        num_classes: int = 10,
+        activation: type = nn.ReLU,
+        conv1_out_channels: int = 6,
+        conv2_out_channels: int = 16,
+        fc1_units: int = 120,
+        fc2_units: int = 84
     ) -> None:
-        """
-        Initialize the LeNet model.
-
-        Args:
-            num_classes (int): Number of classes in the dataset. Defaults to 10.
-            activation (type): Activation function class to use (e.g., nn.ReLU). Defaults to nn.ReLU.
-        """
-        
         super(LeNet5, self).__init__()
 
         # Convolutional layers
         self.conv_layers = nn.Sequential(
-            nn.Conv2d(in_channels=1, out_channels=6, kernel_size=5, padding=2),  # Padding to maintain dimensions
+            nn.Conv2d(input_channels, conv1_out_channels, kernel_size=5, padding=2),
             activation(),
             nn.MaxPool2d(kernel_size=2, stride=2),
-            nn.Conv2d(in_channels=6, out_channels=16, kernel_size=5),
+            nn.Conv2d(conv1_out_channels, conv2_out_channels, kernel_size=5),
             activation(),
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
 
-        # TODO: fix this
-        self._fc_input_dim = None
-
-        # Fully connected layers (initialized later)
+        # Fully connected layers will be initialized dynamically
         self.fc_layers = None
-
-        # Number of classes in the model
         self.num_classes = num_classes
-        self.activation = activation  # Save the activation class for later use
+        self.activation = activation
 
     def _initialize_fc_layers(self, x: torch.Tensor) -> None:
         """
-        Initializes the fully connected layers based on the actual input size.
-
-        Args:
-            x (torch.Tensor): Input sample to the convolutional layers.
+        Initialize fully connected layers based on the actual input size.
         """
-        x = self.conv_layers(x)
-        self._fc_input_dim = x.numel() // x.shape[0]  # Size of the flattened input
-        
+        # No need to call the conv layers again here, we already processed them in forward
+        self._fc_input_dim = x.numel() // x.shape[0]
+
+        # Fully connected layers
         self.fc_layers = nn.Sequential(
             nn.Linear(self._fc_input_dim, 120),
             self.activation(),
@@ -61,19 +47,18 @@ class LeNet5(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
-        Forward pass of the LeNet model.
-
-        Args:
-            x (torch.Tensor): Input tensor.
-
-        Returns:
-            torch.Tensor: Output tensor.
+        Forward pass through the model.
         """
+        # Convolutional layers
         x = self.conv_layers(x)
+
+        # Flatten the tensor to pass it to fully connected layers
         x = torch.flatten(x, 1)
 
+        # Initialize fully connected layers if not already created
         if self.fc_layers is None:
-            self._initialize_fc_layers(x)  # Initialize FC layers if they haven't been created yet
+            self._initialize_fc_layers(x)
 
-        x = self.fc_layers(x)
+        x = self.fc_layers(x) # type: ignore
         return x
+

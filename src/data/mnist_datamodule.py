@@ -1,11 +1,12 @@
 from typing import Optional, Tuple
+from sympy import per
 import torch
-from lightning import LightningDataModule
+import pytorch_lightning as pl
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 from torchvision.datasets import MNIST
 from torchvision.transforms import transforms
 
-class MNISTDataModule(LightningDataModule):
+class MNISTDataModule(pl.LightningDataModule):
     """
     LightningDataModule for the MNIST dataset.
 
@@ -76,6 +77,7 @@ class MNISTDataModule(LightningDataModule):
             shuffle=True,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
+            persistent_workers=True
         )
 
     def val_dataloader(self) -> DataLoader:
@@ -87,6 +89,7 @@ class MNISTDataModule(LightningDataModule):
             batch_size=self.batch_size,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
+            persistent_workers=True
         )
 
     def test_dataloader(self) -> DataLoader:
@@ -97,7 +100,8 @@ class MNISTDataModule(LightningDataModule):
             self.data_test,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
+            pin_memory=self.pin_memory,\
+            persistent_workers=True
         )
 
     def predict_dataloader(self) -> DataLoader:
