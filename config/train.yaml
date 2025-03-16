@@ -1,0 +1,5 @@
+defaults:
+  - data: mnist
+  - models: mnist_module
+  - paths: deafult
+  - trainer: deafult

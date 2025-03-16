@@ -1,11 +1,11 @@
 root_dir: .
 
 # path to data directory 
-data_dir: ${paths:root_dir}/data
+data_dir: ${paths:root_dir}/data/
 
 # path to log directory
-log_dir: ${paths:root_dir}/logs
+log_dir: ${paths:root_dir}/logs/
 
 
-output_dir: ${paths:root_dir}/output
+output_dir: ${paths:root_dir}/output/
 

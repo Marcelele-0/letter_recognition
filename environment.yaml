@@ -9,3 +9,4 @@ dependencies:
       - torch
       - torchvision
       - lightning
+      - hydra-core

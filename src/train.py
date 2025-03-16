@@ -1,36 +1,54 @@
+import os
 import pytorch_lightning as pl
 from models.lenet import LeNet5
 from data.mnist_datamodule import MNISTDataModule
 from models.mnist_module import MNISTLitModule
+from utils.split_data import calculate_split_sizes
+from omegaconf import DictConfig
+import hydra
+import importlib
 
-# TODO: Add Hydra for configuration management
-def main():
-    # Hyperparameters and configurations
-    data_dir = "data/"
-    batch_size = 64
-    num_workers = 4
-    pin_memory = True
+@hydra.main(version_base=None, config_path="../config", config_name="train")
+def main(cfg: DictConfig):
+    # Hyperparameters and configurations for data module
+    batch_size = cfg.data.batch_size
+    num_workers = cfg.data.num_workers
+    pin_memory = cfg.data.pin_memory
+    
+    # Split ratios
+    split_ratios = cfg.data.train_val_test_split
+    train_val_test_split = calculate_split_sizes(70_000, split_ratios)
 
     # Initialize the data module
     data_module = MNISTDataModule(
-        data_dir=data_dir,
-        train_val_test_split=(55_000, 5_000, 10_000),
+        train_val_test_split=train_val_test_split,
         batch_size=batch_size,
         num_workers=num_workers,
         pin_memory=pin_memory,
     )
 
+    # Dynamically import the activation function
+    activation_module, activation_class = cfg.models.model.activation.rsplit('.', 1)
+    activation = getattr(importlib.import_module(activation_module), activation_class)
+
     # Initialize the model
-    model = LeNet5(input_channels=1, num_classes=10)
+    model = LeNet5(
+        input_channels=cfg.models.model.input_channels,
+        num_classes=cfg.models.model.num_classes,
+        activation=activation,
+        conv1_out_channels=cfg.models.model.conv1_out_channels,
+        conv2_out_channels=cfg.models.model.conv2_out_channels,
+        fc1_units=cfg.models.model.fc1_units,
+        fc2_units=cfg.models.model.fc2_units
+    )
 
     # Initialize the Lightning module
-    lightning_model = MNISTLitModule(model)
+    lightning_model = MNISTLitModule(model, compile_model=cfg.models.compile)
 
     # Define the trainer
     trainer = pl.Trainer(
-        max_epochs=10,
-        devices=1, 
-        logger=False,  
+        max_epochs=cfg.trainer.max_epochs,
+        logger=cfg.trainer.logger,
 
     )
 
@@ -39,6 +57,8 @@ def main():
 
     # Test the model
     trainer.test(lightning_model, datamodule=data_module)
+
+
 
 if __name__ == "__main__":
     main()

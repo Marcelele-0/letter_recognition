@@ -1,0 +1,14 @@
+_target_: src.models.mnist_module.MNISTLitModule
+
+model:
+  _target_: src.models.lenet.LeNet5
+  num_classes: 10
+  input_channels: 1
+  activation: torch.nn.ReLU
+  conv1_out_channels: 6
+  conv2_out_channels: 16
+  fc1_units: 120
+  fc2_units: 84
+
+# compile model for faster training with pytorch 2.0
+compile: true
