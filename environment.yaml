@@ -1,12 +1,15 @@
 name: letter_recognition
-dependencies:
-  - python=3.8
+channels:
   - pytorch
-  - torchvision
-  - pytorch-lightning
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - cudatoolkit=11.7         
+  - numpy<2               
+  - pytorch=2.0.1         
+  - torchvision=0.15.2     
+  - pytorch-lightning=1.9.5   
   - pip
   - pip:
-      - torch
-      - torchvision
-      - lightning
-      - hydra-core
+      - hydra-core>=1.4.5    
