@@ -43,7 +43,7 @@ class LeNet5(nn.Module):
             nn.Linear(120, 84),
             self.activation(),
             nn.Linear(84, self.num_classes)
-        )
+        ).to(x.device)  # Ensure the layers are on the same device as the input tensor
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
