@@ -138,7 +138,10 @@ class MNISTLitModule(pl.LightningModule):
 
     def configure_optimizers(self):
         # Define the optimizer
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=1e-3) # type: ignore - pylance reports an error, but it's correct
+        optimizer = torch.optim.Adam( 
+            self.model.parameters(), # type: ignore[call-arg]
+            lr=1e-3,
+            weight_decay=1e-4 ) 
 
         # Define the scheduler (StepLR)
         scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)

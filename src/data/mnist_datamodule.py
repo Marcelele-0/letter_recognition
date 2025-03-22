@@ -1,5 +1,4 @@
 from typing import Optional, Tuple
-from sympy import per
 import torch
 import pytorch_lightning as pl
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
@@ -100,7 +99,7 @@ class MNISTDataModule(pl.LightningDataModule):
             self.data_test,
             batch_size=self.batch_size,
             num_workers=self.num_workers,
-            pin_memory=self.pin_memory,\
+            pin_memory=self.pin_memory,
             persistent_workers=True
         )
 
