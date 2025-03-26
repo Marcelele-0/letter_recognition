@@ -47,9 +47,9 @@ def main(cfg: DictConfig):
 
     # Define the trainer
     trainer = pl.Trainer(
+        accelerator="gpu",
         max_epochs=cfg.trainer.max_epochs,
         logger=cfg.trainer.logger,
-
     )
 
     # Train the model

@@ -85,7 +85,7 @@ class MNISTLitModule(pl.LightningModule):
         preds = torch.argmax(logits, dim=1)
         return loss, preds, y
 
-    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> torch.Tensor:
+    def training_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> torch.Tensor:
         """Single training step."""
         loss, preds, targets = self.model_step(batch)
 
@@ -97,7 +97,7 @@ class MNISTLitModule(pl.LightningModule):
 
         return loss
 
-    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> None:
+    def validation_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         """Single validation step."""
         loss, preds, targets = self.model_step(batch)
 
@@ -108,7 +108,7 @@ class MNISTLitModule(pl.LightningModule):
         self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
 
-    def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor]) -> None:
+    def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         """Single test step."""
         loss, preds, targets = self.model_step(batch)
 

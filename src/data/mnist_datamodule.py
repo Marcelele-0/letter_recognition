@@ -36,9 +36,18 @@ class MNISTDataModule(pl.LightningDataModule):
         self.num_workers = num_workers
         self.pin_memory = pin_memory
 
-        self.transforms = transforms.Compose(
-            [transforms.ToTensor(), transforms.Normalize((0.1307,), (0.3081,))]
-        )
+        self.train_transforms = transforms.Compose([
+            transforms.RandomRotation(10),  
+            transforms.RandomAffine(degrees=0, translate=(0.1, 0.1)),  
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
+        ])
+
+        self.test_transforms = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,)),
+        ])
+
 
         self.data_train: Optional[Dataset] = None
         self.data_val: Optional[Dataset] = None
@@ -57,8 +66,8 @@ class MNISTDataModule(pl.LightningDataModule):
             stage (Optional[str]): Stage to set up ('fit', 'test', etc.). Defaults to None.
         """
         if not self.data_train and not self.data_val and not self.data_test:
-            trainset = MNIST(self.data_dir, train=True, transform=self.transforms)
-            testset = MNIST(self.data_dir, train=False, transform=self.transforms)
+            trainset = MNIST(self.data_dir, train=True, transform=self.train_transforms)
+            testset = MNIST(self.data_dir, train=False, transform=self.test_transforms)
             dataset = ConcatDataset([trainset, testset])
             self.data_train, self.data_val, self.data_test = random_split(
                 dataset=dataset,

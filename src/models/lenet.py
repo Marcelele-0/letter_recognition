@@ -17,12 +17,15 @@ class LeNet5(nn.Module):
         # Convolutional layers
         self.conv_layers = nn.Sequential(
             nn.Conv2d(input_channels, conv1_out_channels, kernel_size=5, padding=2),
+            nn.BatchNorm2d(conv1_out_channels),
             activation(),
             nn.MaxPool2d(kernel_size=2, stride=2),
             nn.Conv2d(conv1_out_channels, conv2_out_channels, kernel_size=5),
+            nn.BatchNorm2d(conv2_out_channels),
             activation(),
             nn.MaxPool2d(kernel_size=2, stride=2)
         )
+
 
         # Fully connected layers will be initialized dynamically
         self.fc_layers = None
@@ -39,8 +42,10 @@ class LeNet5(nn.Module):
         # Fully connected layers
         self.fc_layers = nn.Sequential(
             nn.Linear(self._fc_input_dim, 120),
+            nn.Dropout(0.2),
             self.activation(),
             nn.Linear(120, 84),
+            nn.Dropout(0.2),
             self.activation(),
             nn.Linear(84, self.num_classes)
         ).to(x.device)  # Ensure the layers are on the same device as the input tensor

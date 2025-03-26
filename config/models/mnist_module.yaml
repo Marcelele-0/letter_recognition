@@ -5,8 +5,8 @@ model:
   num_classes: 10
   input_channels: 1
   activation: torch.nn.ReLU
-  conv1_out_channels: 6
-  conv2_out_channels: 16
+  conv1_out_channels: 32
+  conv2_out_channels: 64
   fc1_units: 120
   fc2_units: 84
 

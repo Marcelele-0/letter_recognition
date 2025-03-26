@@ -12,4 +12,5 @@ dependencies:
   - pytorch-lightning=1.9.5   
   - pip
   - pip:
-      - hydra-core>=1.4.5    
+      - hydra-core
+          
