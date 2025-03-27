@@ -11,13 +11,16 @@ from torch.nn import Sequential, Conv2d, Linear, ReLU, Flatten, BatchNorm2d, Max
 # Fix for OpenMP error
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-CHECKPOINT_PATH = "wandb_logs/MNIST-Training/8s2t8yyt/checkpoints/epoch=9-step=8440.ckpt"
+CHECKPOINT_PATH = "wandb_logs/MNIST-Training/h57gb7f6/checkpoints/epoch=9-step=8440.ckpt"
 DATA_DIR = "data/my_data/"
 
 def load_model(checkpoint_path):
     """Load the trained model from a checkpoint."""
-    with torch.serialization.safe_globals([LeNet5, Sequential, Conv2d, BatchNorm2d, ReLU, MaxPool2d, Linear, Flatten, Dropout]):
-        model = MNISTLitModule.load_from_checkpoint(checkpoint_path, weights_only=False)
+    model = MNISTLitModule.load_from_checkpoint(
+        checkpoint_path, 
+        weights_only=False, 
+        map_location=torch.device('cpu')
+    )
     model.eval()
     return model
 
