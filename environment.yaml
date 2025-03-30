@@ -9,7 +9,8 @@ dependencies:
   - numpy<2               
   - pytorch=2.0.1         
   - torchvision=0.15.2     
-  - pytorch-lightning=1.9.5   
+  - pytorch-lightning=1.9.5
+  - wandb=0.15.0
   - pip
   - pip:
       - hydra-core

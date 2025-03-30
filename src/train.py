@@ -5,8 +5,11 @@ from data.mnist_datamodule import MNISTDataModule
 from models.mnist_module import MNISTLitModule
 from utils.split_data import calculate_split_sizes
 from omegaconf import DictConfig
+from omegaconf import OmegaConf
 import hydra
 import importlib
+from pytorch_lightning.loggers import WandbLogger 
+import wandb
 
 @hydra.main(version_base=None, config_path="../config", config_name="train")
 def main(cfg: DictConfig):
@@ -42,6 +45,14 @@ def main(cfg: DictConfig):
         fc2_units=cfg.models.model.fc2_units
     )
 
+    # Initialize W&B logger
+    wandb_logger = WandbLogger(        
+        project=cfg.logger.project,
+        name=cfg.logger.run_name,
+        save_dir=cfg.logger.save_dir,
+        log_model=cfg.logger.log_model
+    )
+
     # Initialize the Lightning module
     lightning_model = MNISTLitModule(model, compile_model=cfg.models.compile)
 
@@ -49,8 +60,13 @@ def main(cfg: DictConfig):
     trainer = pl.Trainer(
         accelerator="gpu",
         max_epochs=cfg.trainer.max_epochs,
-        logger=cfg.trainer.logger,
+        logger=wandb_logger,
     )
+
+    # logging hyperparameters to W&B
+    wandb_logger.experiment.config.update(
+        OmegaConf.to_container(cfg, resolve=True, structured_config_mode="dict")
+    )  
 
     # Train the model
     trainer.fit(lightning_model, datamodule=data_module)
@@ -58,6 +74,8 @@ def main(cfg: DictConfig):
     # Test the model
     trainer.test(lightning_model, datamodule=data_module)
 
+    # Zamknięcie sesji W&B
+    wandb.finish()
 
 
 if __name__ == "__main__":
