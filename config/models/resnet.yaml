@@ -1,0 +1,11 @@
+_target_: src.models.mnist_module.MNISTLitModule
+
+name: mnist_resnet18
+
+model:
+  _target_: src.models.resnet18.ResNetLitModule
+  num_classes: 10
+  input_channels: 1
+  activation: torch.nn.ReLU
+
+compile: false

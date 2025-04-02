@@ -1,4 +1,4 @@
 project: "MNIST-Training"  
-run_name: "lenet5_experiment" 
+run_name: "resnet18_mnist" 
 save_dir: "./wandb_logs"  
 log_model: True  

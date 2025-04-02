@@ -1,6 +1,6 @@
 defaults:
   - data: mnist
-  - models: mnist_module
+  - models: resnet
   - paths: deafult
   - trainer: deafult
   - logger: wandb
