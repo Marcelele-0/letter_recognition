@@ -74,7 +74,7 @@ def main(cfg: DictConfig):
     # Test the model
     trainer.test(lightning_model, datamodule=data_module)
 
-    # Zamknięcie sesji W&B
+    # close W&B run
     wandb.finish()
 
 
