@@ -4,7 +4,7 @@ from typing import Tuple
 import torch 
 import pytorch_lightning as pl
 from torchmetrics import MaxMetric, MeanMetric
-from torchmetrics.classification.accuracy import Accuracy
+from torchmetrics import Accuracy, Precision, Recall, MeanMetric, MaxMetric
 
 
 class MNISTLitModule(pl.LightningModule):
@@ -39,11 +39,18 @@ class MNISTLitModule(pl.LightningModule):
         self.val_acc = Accuracy(task="multiclass", num_classes=10)
         self.test_acc = Accuracy(task="multiclass", num_classes=10)
 
+        self.train_precision = Precision(task="multiclass", num_classes=10, average="macro")
+        self.val_precision = Precision(task="multiclass", num_classes=10, average="macro")
+        self.test_precision = Precision(task="multiclass", num_classes=10, average="macro")
+
+        self.train_recall = Recall(task="multiclass", num_classes=10, average="macro")
+        self.val_recall = Recall(task="multiclass", num_classes=10, average="macro")
+        self.test_recall = Recall(task="multiclass", num_classes=10, average="macro")
+
         # Loss to track
         self.train_loss = MeanMetric()
         self.val_loss = MeanMetric()
         self.test_loss = MeanMetric()
-
         self.val_acc_best = MaxMetric()
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
