@@ -158,11 +158,11 @@ class MNISTLitModule(pl.LightningModule):
         # Define the optimizer
         optimizer = torch.optim.Adam( 
             self.model.parameters(), # type: ignore[call-arg]
-            lr=1e-3,
+            lr=3e-3,
             weight_decay=1e-4 ) 
 
         # Define the scheduler (StepLR)
-        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
+        scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=2, gamma=0.7)
 
         # Return optimizer and scheduler
         return [optimizer], [scheduler]
