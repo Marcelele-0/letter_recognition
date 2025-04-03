@@ -11,7 +11,7 @@ from torch.nn import Sequential, Conv2d, Linear, ReLU, Flatten, BatchNorm2d, Max
 # Fix for OpenMP error
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
-CHECKPOINT_PATH = "wandb_logs/MNIST-Training/wzsrz3qv/checkpoints/epoch=9-step=8750.ckpt"
+CHECKPOINT_PATH = "wandb_logs/MNIST-Training/8s2t8yyt/checkpoints/epoch=9-step=8440.ckpt"
 DATA_DIR = "data/my_data/"
 
 def load_model(checkpoint_path):
