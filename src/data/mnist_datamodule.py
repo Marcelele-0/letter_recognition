@@ -68,12 +68,22 @@ class MNISTDataModule(pl.LightningDataModule):
         if not self.data_train and not self.data_val and not self.data_test:
             trainset = MNIST(self.data_dir, train=True, transform=self.train_transforms)
             testset = MNIST(self.data_dir, train=False, transform=self.test_transforms)
-            dataset = ConcatDataset([trainset, testset])
-            self.data_train, self.data_val, self.data_test = random_split(
-                dataset=dataset,
-                lengths=self.train_val_test_split,
+
+            # Ensure the split sizes match the dataset size
+            total_train_samples = len(trainset)
+            train_val_split = self.train_val_test_split[:2]
+            if sum(train_val_split) != total_train_samples:
+                train_val_split = (int(total_train_samples * 0.9), int(total_train_samples * 0.1))
+
+            # Split trainset into training and validation sets
+            self.data_train, self.data_val = random_split(
+                dataset=trainset,
+                lengths=train_val_split,
                 generator=torch.Generator().manual_seed(42),
             )
+
+            # Use testset directly for testing
+            self.data_test = testset
 
     def train_dataloader(self) -> DataLoader:
         """Return the training DataLoader."""
@@ -112,13 +122,3 @@ class MNISTDataModule(pl.LightningDataModule):
             persistent_workers=True
         )
 
-    def predict_dataloader(self) -> DataLoader:
-        """Return the prediction DataLoader."""
-        if self.data_test is None:
-            raise ValueError("data_test is None. Did you run MnistDataModule.setup()?")
-        return DataLoader(
-            self.data_test,
-            batch_size=self.batch_size,
-            num_workers=self.num_workers,
-            pin_memory=self.pin_memory,
-        )
