@@ -27,19 +27,19 @@ conda remove --name letter_recognition --all
 
 | Metric                  | Value  | Description |
 |----------------------|--------|-------------|
-| **Train Accuracy** (`train/acc`) | **86.66%** | Percentage of correctly classified samples in the training set. |
-| **Validation Accuracy** (`val/acc`) | **93.77%** | Accuracy on the validation set, indicating generalization performance. |
-| **Test Accuracy** (`test/acc`) | **93.74%** | Final model accuracy on the test set. |
-| **Train Precision** (`train/precision`) | **87.30%** | Precision on the training set – percentage of correctly predicted positive cases. |
-| **Validation Precision** (`val/precision`) | **93.49%** | Precision on the validation set – measures false positive rate. |
-| **Test Precision** (`test/precision`) | **93.68%** | Precision on the test set – macro-averaged across all classes. |
-| **Train Recall** (`train/recall`) | **86.53%** | Recall on the training set – percentage of actual positives correctly identified. |
-| **Validation Recall** (`val/recall`) | **93.65%** | Recall on the validation set – measures false negative rate. |
-| **Test Recall** (`test/recall`) | **93.60%** | Recall on the test set – macro-averaged across all classes. |
-| **Train Loss** (`train/loss`) | **0.591** | Training loss – lower values indicate better fit to training data. |
-| **Validation Loss** (`val/loss`) | **0.395** | Validation loss – helps detect overfitting. |
-| **Test Loss** (`test/loss`) | **0.404** | Final loss on the test set – lower is better. |
-| **Best Validation Accuracy** (`val/acc_best`) | **93.77%** | The best validation accuracy achieved during training. |
+| **Train Accuracy** (`train/acc`) | **87.95%** | Percentage of correctly classified samples in the training set. |
+| **Validation Accuracy** (`val/acc`) | **94.80%** | Accuracy on the validation set, indicating generalization performance. |
+| **Test Accuracy** (`test/acc`) | **98.05%** | Final model accuracy on the test set. |
+| **Train Precision** (`train/precision`) | **88.10%** | Precision on the training set – percentage of correctly predicted positive cases. |
+| **Validation Precision** (`val/precision`) | **95.03%** | Precision on the validation set – measures false positive rate. |
+| **Test Precision** (`test/precision`) | **98.12%** | Precision on the test set – macro-averaged across all classes. |
+| **Train Recall** (`train/recall`) | **87.98%** | Recall on the training set – percentage of actual positives correctly identified. |
+| **Validation Recall** (`val/recall`) | **94.77%** | Recall on the validation set – measures false negative rate. |
+| **Test Recall** (`test/recall`) | **98.06%** | Recall on the test set – macro-averaged across all classes. |
+| **Train Loss** (`train/loss`) | **0.519** | Training loss – lower values indicate better fit to training data. |
+| **Validation Loss** (`val/loss`) | **0.331** | Validation loss – helps detect overfitting. |
+| **Test Loss** (`test/loss`) | **0.138** | Final loss on the test set – lower is better. |
+| **Best Validation Accuracy** (`val/acc_best`) | **94.80%** | The best validation accuracy achieved during training. |
 
 ###  Key Insights
 
