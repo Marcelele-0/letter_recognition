@@ -1,9 +1,7 @@
 from typing import Tuple
 
-
 import torch 
 import pytorch_lightning as pl
-from torchmetrics import MaxMetric, MeanMetric
 from torchmetrics import Accuracy, Precision, Recall, MeanMetric, MaxMetric
 
 
@@ -101,6 +99,8 @@ class MNISTLitModule(pl.LightningModule):
 
         self.log("train/loss", self.train_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("train/acc", self.train_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/precision", self.train_precision(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
+        self.log("train/recall", self.train_recall(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
 
         return loss
 
@@ -114,6 +114,8 @@ class MNISTLitModule(pl.LightningModule):
 
         self.log("val/loss", self.val_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("val/acc", self.val_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/precision", self.val_precision(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
+        self.log("val/recall", self.val_recall(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
 
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         """Single test step."""
@@ -125,12 +127,21 @@ class MNISTLitModule(pl.LightningModule):
 
         self.log("test/loss", self.test_loss, on_step=False, on_epoch=True, prog_bar=True)
         self.log("test/acc", self.test_acc, on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/precision", self.test_precision(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
+        self.log("test/recall", self.test_recall(preds, targets), on_step=False, on_epoch=True, prog_bar=True)
 
     def on_train_start(self) -> None:
-        """Resets validation metrics at the start of training."""
+        """Resets validation and training metrics at the start of training."""
+        self.train_loss.reset()
+        self.train_acc.reset()
+        self.train_precision.reset()
+        self.train_recall.reset()
+        
         self.val_loss.reset()
         self.val_acc.reset()
         self.val_acc_best.reset()
+        self.val_precision.reset()
+        self.val_recall.reset()
 
     def on_validation_epoch_end(self) -> None:
         """Updates the best validation accuracy at the end of each epoch."""
