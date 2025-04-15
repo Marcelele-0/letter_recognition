@@ -6,6 +6,7 @@ import random
 import matplotlib.pyplot as plt
 from models.mnist_module import MNISTLitModule
 from models.lenet import LeNet5
+import torch.serialization
 from torch.nn import Sequential, Conv2d, Linear, ReLU, Flatten, BatchNorm2d, MaxPool2d, Dropout
 
 # Fix for OpenMP error
@@ -16,10 +17,11 @@ DATA_DIR = "data/my_data/"
 
 def load_model(checkpoint_path):
     """Load the trained model from a checkpoint."""
+    torch.serialization.add_safe_globals([LeNet5, Sequential, Conv2d, Linear, ReLU, Flatten, BatchNorm2d, MaxPool2d, Dropout])
     model = MNISTLitModule.load_from_checkpoint(
-        checkpoint_path, 
-        weights_only=False, 
-        map_location=torch.device('cpu')
+        checkpoint_path,
+        map_location=torch.device("cpu"),
+        weights_only=False
     )
     model.eval()
     return model

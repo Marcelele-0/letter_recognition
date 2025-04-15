@@ -51,3 +51,35 @@ conda remove --name letter_recognition --all
    - Possible underfitting – further training might improve performance.  
 
 
+## Project Structure
+
+```
+number_recognition/
+├── config/
+│   ├── logger/
+│   │   └── wandb.yaml          # Configuration for W&B logger
+│   ├── paths/
+│   │   └── deafult.yaml        # Paths configuration (data, logs, output)
+│   └── train.yaml              # (Not provided, likely contains training configurations)
+├── data/
+│   ├── mnist_datamodule.py     # PyTorch Lightning DataModule for MNIST
+│   └── my_data/                # Directory for custom data (used in XAI script)
+├── models/
+│   ├── lenet.py                # Implementation of LeNet-5 model
+│   ├── mnist_module.py         # Lightning module for MNIST training
+│   └── __init__.py             # (Optional, for module initialization)
+├── src/
+│   ├── train.py                # Main training script using Hydra and PyTorch Lightning
+│   ├── xai_explain.py          # XAI script for explaining predictions with saliency maps
+│   └── utils/
+│       └── split_data.py       # Utility for calculating train/val/test splits
+├── wandb_logs/                 # Directory for W&B logs and checkpoints
+│   └── MNIST-Training/
+│       └── h57gb7f6/
+│           └── checkpoints/    # Checkpoints saved during training
+│               └── epoch=9-step=8440.ckpt
+├── README.md                   # Documentation for the project
+└── environment.yaml            # Conda environment configuration file
+```
+
+This structure provides an overview of the project's organization and key components.
