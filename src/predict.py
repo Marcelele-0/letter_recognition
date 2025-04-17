@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from models.mnist_module import MNISTLitModule
 from models.lenet import LeNet5
 import torch.serialization
+from xai.gradcam import generate_gradcam, show_gradcam
 from torch.nn import Sequential, Conv2d, Linear, ReLU, Flatten, BatchNorm2d, MaxPool2d, Dropout
 
 # Fix for OpenMP error
@@ -92,7 +93,37 @@ def predict_and_visualize(model, transform, images, all_images):
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     plt.show()
 
-    print(f"Accuracy on entire dataset: {accuracy:.2f}%")
+def visualize_gradcam_samples(model, transform, all_images, num_samples=6):
+    """Generate Grad-CAM visualizations for a few random samples."""
+    selected_samples = random.sample(all_images, num_samples)
+
+    fig, axes = plt.subplots(num_samples, 2, figsize=(6, 3 * num_samples))
+    if num_samples == 1:
+        axes = [axes]
+
+    for idx, (img_path, true_label) in enumerate(selected_samples):
+        image = Image.open(img_path).convert("L")
+        augmented = transform(image).unsqueeze(0)
+
+        with torch.no_grad():
+            output = model(augmented)
+            pred_label = output.argmax(dim=1).item()
+
+        heatmap = generate_gradcam(model, augmented, target_class=None)
+
+        # Left: original
+        axes[idx][0].imshow(augmented.squeeze().cpu(), cmap="gray")
+        axes[idx][0].set_title(f"True: {true_label}, Pred: {pred_label}")
+        axes[idx][0].axis("off")
+
+        # Right: Grad-CAM overlay
+        axes[idx][1].imshow(augmented.squeeze().cpu(), cmap="gray")
+        axes[idx][1].imshow(heatmap, cmap="jet", alpha=0.5)
+        axes[idx][1].set_title("Grad-CAM")
+        axes[idx][1].axis("off")
+
+    plt.tight_layout()
+    plt.show()
 
 def main():
     """Main function to load the model, process images, and make predictions."""
@@ -100,7 +131,11 @@ def main():
     transform = get_transform()
     all_images = load_images(DATA_DIR, num_samples=None)  # Load all images
     sample_images = random.sample(all_images, 10)  # Select a random sample of 10 images
+
     predict_and_visualize(model, transform, sample_images, all_images)
+
+    # Now show multiple Grad-CAM visualizations
+    visualize_gradcam_samples(model, transform, all_images, num_samples=6)
 
 if __name__ == "__main__":
     main()

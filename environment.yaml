@@ -14,4 +14,5 @@ dependencies:
   - pip
   - pip:
       - hydra-core
+      - opencv-python
           
