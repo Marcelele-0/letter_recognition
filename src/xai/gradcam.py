@@ -1,7 +1,6 @@
 import torch
 import torch.nn.functional as F
 import numpy as np
-import cv2
 import matplotlib.pyplot as plt
 
 
@@ -52,15 +51,16 @@ def generate_gradcam(model, image_tensor, target_class=None):
     cam = torch.sum(weights[:, None, None] * act, dim=0)
     cam = F.relu(cam)
 
-    cam = cam.detach().cpu().numpy()
+    cam = cam.detach().cpu()
+    cam = cam.unsqueeze(0).unsqueeze(0)  # 1x1xH xW for interpolation
+    cam = F.interpolate(cam, size=(28, 28), mode='bilinear', align_corners=False)
+    cam = cam.squeeze().numpy()
     cam -= cam.min()
     cam /= cam.max()
-    cam = cv2.resize(cam, (28, 28))
 
     # Usuwamy hooki
     f_hook.remove()
     b_hook.remove()
-
     return cam
 
 def show_gradcam(image_tensor, heatmap, title="Grad-CAM"):
